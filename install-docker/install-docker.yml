@@ -1,0 +1,44 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: no
+  vars:
+      DOCKER_COMPOSE_VER: "1.25.4"
+
+  tasks:
+      - name: Run "pacman -Syu"
+        pacman:
+            update_cache: yes
+            upgrade: yes
+
+      - name: Install required packages
+        pacman:
+            name: 
+                - runc
+                - containerd
+                - device-mapper
+            state: latest
+            update_cache: yes
+      - name: Install Docker
+        pacman:
+            name: docker
+            state: latest
+            update_cache: yes
+
+      - name: Start Docker service
+        service:
+            name: docker
+            state: started
+            enabled: yes
+
+      - name: Add myself to the docker group
+        user:
+            name: gianluca
+            groups: docker
+            append: yes
+
+      - name: Install Docker Compose
+        pacman:
+            name: docker-compose
+            state: latest
+            update_cache: yes
